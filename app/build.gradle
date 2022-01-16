@@ -28,6 +28,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
@@ -41,7 +45,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
-        viewBinding = true
+        viewBinding true
     }
 }
 
@@ -66,6 +70,9 @@ dependencies {
     // Material design
     implementation "com.google.android.material:material:$material"
 
+    // Dialogs
+    implementation "com.afollestad.material-dialogs:core:$material_dialogs"
+
     // Navigator
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation"
@@ -80,7 +87,7 @@ dependencies {
     implementation "androidx.hilt:hilt-navigation-fragment:$androidx_hilt"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     testImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
-    kaptTest "com.google.dagger:hilt-compiler$hilt_version"
+    kaptTest "com.google.dagger:hilt-compiler:$hilt_version"
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
@@ -102,8 +109,15 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$glide_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
 
-    // Core test libraries
+    // Core unit test libraries
     testImplementation "junit:junit:$junit_version"
+    testImplementation "org.mockito:mockito-core:$mockito"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$mockWebServer"
+    testImplementation "androidx.arch.core:core-testing:$arch_core"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_test"
+
+    // Core android test libraries
     androidTestImplementation "androidx.test.ext:junit:$androidx_test_ext_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Subtitle1">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/subtitle1_text_size</item>
+        <item name="android:textColor">@color/system_black_87</item>
+    </style>
+</resources>
