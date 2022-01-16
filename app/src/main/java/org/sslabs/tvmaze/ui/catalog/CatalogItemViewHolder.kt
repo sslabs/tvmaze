@@ -10,16 +10,22 @@ import org.sslabs.tvmaze.databinding.ItemShowBinding
 class CatalogItemViewHolder(
     private val itemBinding: ItemShowBinding,
     private val requestOptions: RequestOptions,
+    private val interaction: Interaction
 ) : RecyclerView.ViewHolder(itemBinding.root) {
 
     fun bind(show: Show) {
         itemBinding.apply {
-            this.itemShowTitle.text = show.name
+            root.setOnClickListener { interaction.onCatalogItemSelected(adapterPosition, show) }
+            itemShowTitle.text = show.name
             Glide.with(this.root)
                 .setDefaultRequestOptions(requestOptions)
                 .load(show.image)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this.itemShowPoster)
         }
+    }
+
+    interface Interaction {
+        fun onCatalogItemSelected(position: Int, item: Show)
     }
 }

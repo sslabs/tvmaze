@@ -8,4 +8,9 @@
     <string name="text_yes">yes</string>
     <string name="text_info">Info</string>
     <string name="menu_title_search">Search</string>
+    <string name="show_schedule_airs_on">Airs on:</string>
+    <string name="show_schedule_at">at:</string>
+    <string name="show_details_episodes">Episodes</string>
+    <string name="season_title">Season %1$d</string>
+    <string name="season_episode_name">%1$02d - %2$s</string>
 </resources>

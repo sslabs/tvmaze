@@ -2,14 +2,14 @@ package org.sslabs.tvmaze.data.api.entity
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import org.sslabs.tvmaze.ShowApiConstants
+import org.sslabs.tvmaze.ImageApiConstants
 
-data class ShowImageApiEntity(
+data class ImageApiEntity(
     @Expose
-    @SerializedName(ShowApiConstants.MEDIUM)
+    @SerializedName(ImageApiConstants.MEDIUM)
     val medium: String? = null,
 
     @Expose
-    @SerializedName(ShowApiConstants.ORIGINAL)
+    @SerializedName(ImageApiConstants.ORIGINAL)
     val original: String? = null
 )

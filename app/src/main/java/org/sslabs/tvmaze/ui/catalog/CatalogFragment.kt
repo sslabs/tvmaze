@@ -7,14 +7,15 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.appcompat.widget.SearchView
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import org.sslabs.tvmaze.R
+import org.sslabs.tvmaze.data.model.Show
 import org.sslabs.tvmaze.databinding.FragmentCatalogBinding
-import org.sslabs.tvmaze.ui.BaseFragment
+import org.sslabs.tvmaze.ui.base.BaseFragment
 import org.sslabs.tvmaze.util.SpacingItemDecoration
 import org.sslabs.tvmaze.util.StateMessageCallback
 import org.sslabs.tvmaze.util.processQueue
@@ -24,10 +25,10 @@ import kotlin.math.floor
 
 
 @AndroidEntryPoint
-class CatalogFragment : BaseFragment() {
+class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
 
     private lateinit var binding: FragmentCatalogBinding
-    private val viewModel: CatalogViewModel by hiltNavGraphViewModels(R.id.navigation)
+    private val viewModel: CatalogViewModel by viewModels()
     private lateinit var searchView: SearchView
     private lateinit var menu: Menu
 
@@ -45,11 +46,9 @@ class CatalogFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
+
         initViews()
         observeData()
-
-        viewModel.onTriggerEvent(CatalogEvent.Index)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -59,8 +58,17 @@ class CatalogFragment : BaseFragment() {
         initSearchView()
     }
 
+    override fun onCatalogItemSelected(position: Int, item: Show) {
+        navigateToShowDetails(item)
+    }
+
     private fun initViews() {
+        initToolbar()
         initCatalog()
+    }
+
+    private fun initToolbar() {
+        setHasOptionsMenu(true)
     }
 
     private fun initCatalog() {
@@ -168,5 +176,9 @@ class CatalogFragment : BaseFragment() {
     private fun executeNewQuery(query: String) {
         viewModel.onTriggerEvent(CatalogEvent.UpdateQuery(query))
         viewModel.onTriggerEvent(CatalogEvent.NewSearch)
+    }
+
+    private fun navigateToShowDetails(show: Show) {
+        screensNavigator.fromCatalogToShowDetails(show)
     }
 }

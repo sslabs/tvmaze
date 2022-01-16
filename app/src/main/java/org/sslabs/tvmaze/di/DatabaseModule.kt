@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import org.sslabs.tvmaze.data.local.db.TvMazeDatabase
+import org.sslabs.tvmaze.data.local.db.dao.EpisodeDao
 import org.sslabs.tvmaze.data.local.db.dao.ShowDao
 import javax.inject.Singleton
 
@@ -28,6 +29,11 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideFighterDao(tvMazeDatabase: TvMazeDatabase): ShowDao =
+    fun provideShowDao(tvMazeDatabase: TvMazeDatabase): ShowDao =
         tvMazeDatabase.showDao()
+
+    @Singleton
+    @Provides
+    fun provideEpisodeDao(tvMazeDatabase: TvMazeDatabase): EpisodeDao =
+        tvMazeDatabase.episodeDao()
 }

@@ -1,5 +1,7 @@
 package org.sslabs.tvmaze.data.model
 
+import java.io.Serializable
+
 data class Show(
     val id: Int,
     val name: String?,
@@ -8,4 +10,4 @@ data class Show(
     val days: List<String>?,
     val genres: List<String>?,
     val summary: String?
-)
+) : Serializable

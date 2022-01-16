@@ -4,5 +4,17 @@
     <dimen name="card_width">185dp</dimen>
     <dimen name="card_height">260dp</dimen>
     <dimen name="card_title_margins">16dp</dimen>
-    <dimen name="subtitle1_text_size">16sp</dimen>
+    <dimen name="fragment_episodes_title_margin">16dp</dimen>
+    <dimen name="fragment_show_details_card_margin">8dp</dimen>
+    <dimen name="fragment_show_details_card_elevation">8dp</dimen>
+    <dimen name="fragment_show_details_chip_group_margin_top">16dp</dimen>
+    <dimen name="fragment_show_details_chip_group_margin_horizontal">8dp</dimen>
+    <dimen name="fragment_show_details_summary_margin">16dp</dimen>
+    <dimen name="item_season_episode_margin">6dp</dimen>
+    <dimen name="show_schedule_layout_airs_on_margin">8dp</dimen>
+    <dimen name="show_schedule_layout_days_margin_start">6dp</dimen>
+    <dimen name="show_schedule_layout_days_margin_top">4dp</dimen>
+    <dimen name="show_schedule_layout_days_margin_end">8dp</dimen>
+    <dimen name="show_schedule_layout_at_margin">8dp</dimen>
+    <dimen name="show_schedule_layout_time_margin">1dp</dimen>
 </resources>

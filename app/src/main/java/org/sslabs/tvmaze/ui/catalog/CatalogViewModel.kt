@@ -26,6 +26,10 @@ class CatalogViewModel @Inject constructor(
     val state: LiveData<CatalogState>
         get() = _state
 
+    init {
+        onTriggerEvent(CatalogEvent.Index)
+    }
+
     fun onTriggerEvent(event: CatalogEvent) {
         when (event) {
             is CatalogEvent.Index -> {
@@ -56,6 +60,10 @@ class CatalogViewModel @Inject constructor(
 
                 dataState.data?.let { list ->
                     onUpdateLoadFromCache(list)
+                }
+
+                dataState.stateMessage?.let { stateMessage ->
+                    appendToMessageQueue(stateMessage)
                 }
             }.launchIn(viewModelScope)
         }

@@ -1,14 +1,18 @@
-package org.sslabs.tvmaze.ui
+package org.sslabs.tvmaze.ui.base
 
 import android.content.Context
 import androidx.fragment.app.Fragment
-import dagger.hilt.android.AndroidEntryPoint
+import org.sslabs.tvmaze.navigation.IScreensNavigator
+import org.sslabs.tvmaze.ui.UICommunicationListener
 import timber.log.Timber
+import javax.inject.Inject
 
-@AndroidEntryPoint
-open class BaseFragment : Fragment() {
+abstract class BaseFragment : Fragment() {
 
     lateinit var uiCommunicationListener: UICommunicationListener
+
+    @Inject
+    lateinit var screensNavigator: IScreensNavigator
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

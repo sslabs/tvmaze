@@ -15,7 +15,7 @@ data class ShowApiEntity(
 
     @Expose
     @SerializedName(ShowApiConstants.IMAGE)
-    val image: ShowImageApiEntity? = null,
+    val image: ImageApiEntity? = null,
 
     @Expose
     @SerializedName(ShowApiConstants.SCHEDULE)

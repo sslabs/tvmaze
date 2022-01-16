@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/show_schedule_airs_on_tv"
+        style="@style/Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/show_schedule_airs_on"
+        android:layout_marginStart="@dimen/show_schedule_layout_airs_on_margin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/airs_days_list"
+        style="@style/Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/show_schedule_layout_days_margin_start"
+        android:layout_marginTop="@dimen/show_schedule_layout_days_margin_top"
+        android:layout_marginEnd="@dimen/show_schedule_layout_days_margin_end"
+        android:singleLine="false"
+        app:layout_constraintStart_toEndOf="@id/show_schedule_airs_on_tv"
+        app:layout_constraintTop_toTopOf="@id/show_schedule_airs_on_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Monday\nTuesday\nWednesday\nThursday\nFriday"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/show_schedule_at_tv"
+        style="@style/Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/show_schedule_layout_at_margin"
+        android:text="@string/show_schedule_at"
+        app:layout_constraintTop_toBottomOf="@id/airs_days_list"
+        app:layout_constraintEnd_toEndOf="@id/show_schedule_airs_on_tv"/>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/show_schedule_time_tv"
+        style="@style/Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/show_schedule_layout_time_margin"
+        app:layout_constraintTop_toTopOf="@id/show_schedule_at_tv"
+        app:layout_constraintBottom_toBottomOf="@id/show_schedule_at_tv"
+        app:layout_constraintStart_toStartOf="@id/airs_days_list"
+        tools:text="07:00"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
