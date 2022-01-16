@@ -28,7 +28,7 @@ class CatalogViewModel @Inject constructor(
 
     fun onTriggerEvent(event: CatalogEvent) {
         when (event) {
-            is CatalogEvent.FirstLoad -> {
+            is CatalogEvent.Index -> {
                 firstLoad()
             }
             is CatalogEvent.NewSearch -> {
@@ -42,6 +42,9 @@ class CatalogViewModel @Inject constructor(
             }
             is CatalogEvent.Error -> {
                 appendToMessageQueue(event.stateMessage)
+            }
+            is CatalogEvent.UpdateQuery -> {
+                onUpdateQuery(event.query)
             }
         }
     }
@@ -58,7 +61,7 @@ class CatalogViewModel @Inject constructor(
         }
     }
 
-    private fun search() {
+    private fun index() {
         _state.value?.let { state ->
             showsRepository.getShows(state.page).onEach { dataState ->
                 this._state.value = state.copy(isLoading = dataState.isLoading)
@@ -78,9 +81,25 @@ class CatalogViewModel @Inject constructor(
         }
     }
 
+    private fun search() {
+        _state.value?.let { state ->
+            showsRepository.searchShows(state.query).onEach { dataState ->
+                this._state.value = state.copy(isLoading = dataState.isLoading)
+
+                dataState.data?.let { list ->
+                    this._state.value = state.copy(catalog = list)
+                }
+
+                dataState.stateMessage?.let { stateMessage ->
+                    appendToMessageQueue(stateMessage)
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
     private fun nextPage() {
         incrementPageNumber()
-        search()
+        index()
     }
 
     private fun incrementPageNumber() {
@@ -113,6 +132,10 @@ class CatalogViewModel @Inject constructor(
         }
     }
 
+    private fun onUpdateQuery(query: String) {
+        _state.value = state.value?.copy(query = query)
+    }
+
     private fun onUpdateQueryExhausted(isExhausted: Boolean) {
         state.value?.let { state ->
             this._state.value = state.copy(isQueryExhausted = isExhausted)
@@ -122,7 +145,7 @@ class CatalogViewModel @Inject constructor(
     private fun onUpdateLoadFromCache(list: List<Show>) {
         _state.value?.let { state ->
             if (list.isEmpty()) {
-                search()
+                index()
             } else {
                 val page = (list.last().id / ApiConstants.PAGE_SIZE)
                 this._state.value = state.copy(catalog = list, page = page)

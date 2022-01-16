@@ -4,11 +4,13 @@ import org.sslabs.tvmaze.util.StateMessage
 
 sealed class CatalogEvent {
 
-    object FirstLoad : CatalogEvent()
+    object Index : CatalogEvent()
 
     object NewSearch : CatalogEvent()
 
     object NextPage : CatalogEvent()
+
+    data class UpdateQuery(val query: String): CatalogEvent()
 
     object OnRemoveHeadFromQueue : CatalogEvent()
 

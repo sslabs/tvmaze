@@ -26,4 +26,9 @@ class ShowDaoFake(
         if (raiseException) throw RuntimeException()
         return db.shows
     }
+
+    override suspend fun queryIdIn(ids: List<Int>): List<ShowCacheEntity> {
+        if (raiseException) throw RuntimeException()
+        return db.shows.filter { ids.contains(it.id) }
+    }
 }

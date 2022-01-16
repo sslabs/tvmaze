@@ -18,4 +18,11 @@ interface ShowDao {
 
     @Query("SELECT * FROM ${ShowDbConstants.TABLE_NAME} ORDER BY ${ShowDbConstants.ID} ASC")
     suspend fun getAll(): List<ShowCacheEntity>
+
+    @Query("""
+        SELECT *
+        FROM ${ShowDbConstants.TABLE_NAME} 
+        WHERE ${ShowDbConstants.ID} IN (:ids)
+        ORDER BY ${ShowDbConstants.ID} ASC""")
+    suspend fun queryIdIn(ids: List<Int>): List<ShowCacheEntity>
 }

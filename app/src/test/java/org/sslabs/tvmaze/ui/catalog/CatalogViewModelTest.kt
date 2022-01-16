@@ -19,11 +19,9 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import org.sslabs.tvmaze.ApiConstants
-import org.sslabs.tvmaze.data.api.handleUseCaseException
 import org.sslabs.tvmaze.data.model.Show
 import org.sslabs.tvmaze.repository.shows.IShowsRepository
 import org.sslabs.tvmaze.util.DataState
-import org.sslabs.tvmaze.util.ErrorHandling
 import org.sslabs.tvmaze.utils.MainCoroutineScopeRule
 
 @ExperimentalCoroutinesApi
@@ -59,7 +57,7 @@ class CatalogViewModelTest {
     }
 
     @Test
-    fun `onTriggerEvent with FirstLoad should delegate to search() when cache is empty`() =
+    fun `onTriggerEvent with FirstLoad should delegate to index() when cache is empty`() =
         runBlocking {
             // Arrange
             val emptyFlow = flow {
@@ -78,7 +76,7 @@ class CatalogViewModelTest {
             `when`(showsListMock.isEmpty()).thenReturn(true)
 
             // Act
-            catalogViewModel.onTriggerEvent(CatalogEvent.FirstLoad)
+            catalogViewModel.onTriggerEvent(CatalogEvent.Index)
             catalogViewModel.state.observeForever(mockObserver)
 
             // Assert
@@ -107,7 +105,7 @@ class CatalogViewModelTest {
             `when`(showsListMock.get(anyInt())).thenReturn(makeShow())
 
             // Act
-            catalogViewModel.onTriggerEvent(CatalogEvent.FirstLoad)
+            catalogViewModel.onTriggerEvent(CatalogEvent.Index)
             catalogViewModel.state.observeForever(mockObserver)
 
             // Assert
@@ -139,7 +137,7 @@ class CatalogViewModelTest {
             `when`(showsListMock.last()).thenReturn(makeShow(ApiConstants.PAGE_SIZE))
 
             // Act
-            catalogViewModel.onTriggerEvent(CatalogEvent.FirstLoad)
+            catalogViewModel.onTriggerEvent(CatalogEvent.Index)
             catalogViewModel.state.observeForever(mockObserver)
 
             // Assert
@@ -158,7 +156,7 @@ class CatalogViewModelTest {
                 delay(10)
                 emit(DataState.data(data = showsListMock, response = null))
             }
-            `when`(showRepositoryMock.getShows(anyInt())).thenReturn(flow)
+            `when`(showRepositoryMock.searchShows(anyString())).thenReturn(flow)
             `when`(showsListMock.get(anyInt())).thenReturn(makeShow())
 
             // Act
@@ -178,26 +176,7 @@ class CatalogViewModelTest {
         }
 
     @Test
-    fun `onTriggerEvent with NewSearch should set query exhausted when page is not found`() =
-        runBlocking {
-            // Arrange
-            val flow = flow<DataState<List<Show>>> {
-                emit(handleUseCaseException(RuntimeException(ErrorHandling.INVALID_PAGE)))
-            }
-            `when`(showRepositoryMock.getShows(anyInt())).thenReturn(flow)
-            `when`(showsListMock.get(anyInt())).thenReturn(makeShow())
-
-            // Act
-            catalogViewModel.onTriggerEvent(CatalogEvent.NewSearch)
-            catalogViewModel.state.observeForever(mockObserver)
-
-            // Assert
-            verify(mockObserver).onChanged(captor.capture())
-            assertTrue("Shall set data state as exhausted", captor.value.isQueryExhausted)
-        }
-
-    @Test
-    fun `onTriggerEvent with nextPage should delegate to search()`() = runBlocking {
+    fun `onTriggerEvent with nextPage should delegate to index()`() = runBlocking {
         // Arrange
         val flow = flow {
             emit(DataState.loading())
@@ -239,6 +218,19 @@ class CatalogViewModelTest {
         // Assert
         verify(mockObserver).onChanged(captor.capture())
         assertEquals("Shall increment page index", 1, captor.value.page)
+    }
+
+    @Test
+    fun `onTriggerEvent with UpdateQuery should change query state`() = runBlocking {
+        // Arrange
+
+        // Act
+        catalogViewModel.onTriggerEvent(CatalogEvent.UpdateQuery("dummy"))
+        catalogViewModel.state.observeForever(mockObserver)
+
+        // Assert
+        verify(mockObserver).onChanged(captor.capture())
+        assertEquals("Shall change query", "dummy", captor.value.query)
     }
 
     private fun makeShow(id: Int = 1) = Show(

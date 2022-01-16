@@ -1,9 +1,12 @@
 package org.sslabs.tvmaze.ui.catalog
 
+import android.app.SearchManager
+import android.content.Context.SEARCH_SERVICE
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import androidx.appcompat.widget.SearchView
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +28,8 @@ class CatalogFragment : BaseFragment() {
 
     private lateinit var binding: FragmentCatalogBinding
     private val viewModel: CatalogViewModel by hiltNavGraphViewModels(R.id.navigation)
+    private lateinit var searchView: SearchView
+    private lateinit var menu: Menu
 
     @Inject
     lateinit var adapter: CatalogAdapter
@@ -40,10 +45,18 @@ class CatalogFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
         initViews()
         observeData()
 
-        viewModel.onTriggerEvent(CatalogEvent.FirstLoad)
+        viewModel.onTriggerEvent(CatalogEvent.Index)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        this.menu = menu
+        inflater.inflate(R.menu.catalog_menu, this.menu)
+        initSearchView()
     }
 
     private fun initViews() {
@@ -68,12 +81,59 @@ class CatalogFragment : BaseFragment() {
                     if (lastPosition == adapter?.itemCount?.minus(1)
                         && viewModel.state.value?.isLoading == false
                         && viewModel.state.value?.isQueryExhausted == false
+                        && viewModel.state.value?.query?.isEmpty() == true
                     ) {
                         Timber.d("BlogFragment: attempting to load next page...")
                         viewModel.onTriggerEvent(CatalogEvent.NextPage)
                     }
                 }
             })
+        }
+    }
+
+    private fun initSearchView() {
+        activity?.apply {
+            val searchManager: SearchManager = getSystemService(SEARCH_SERVICE) as SearchManager
+            searchView = menu.findItem(R.id.catalog_menu_action_search).actionView as SearchView
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+            searchView.maxWidth = Integer.MAX_VALUE
+            searchView.setIconifiedByDefault(true)
+            searchView.isSubmitButtonEnabled = true
+        }
+
+        // Enter on computer keyboard or arrow on virtual keyboard
+        val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
+
+        // set initial value of query text after rotation/navigation
+        viewModel.state.value?.let { state ->
+            if (state.query.isNotBlank()) {
+                searchPlate.setText(state.query)
+                searchView.isIconified = false
+            }
+        }
+        searchPlate.setOnEditorActionListener { v, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_UNSPECIFIED
+                || actionId == EditorInfo.IME_ACTION_SEARCH
+            ) {
+                val searchQuery = v.text.toString()
+                Timber.i("SearchView: (keyboard or arrow) executing search...: $searchQuery")
+                executeNewQuery(searchQuery)
+            }
+            true
+        }
+
+        // Search button clicked in toolbar
+        val searchButton = searchView.findViewById(R.id.search_go_btn) as View
+        searchButton.setOnClickListener {
+            val searchQuery = searchPlate.text.toString()
+            Timber.i("SearchView: (button) executing search...: $searchQuery")
+            executeNewQuery(searchQuery)
+        }
+
+        searchView.setOnCloseListener {
+            viewModel.onTriggerEvent(CatalogEvent.UpdateQuery(""))
+            viewModel.onTriggerEvent(CatalogEvent.Index)
+            false
         }
     }
 
@@ -103,5 +163,10 @@ class CatalogFragment : BaseFragment() {
         val columnWidthDp = resources.getDimension(R.dimen.card_width)
 
         return floor(displayMetrics.widthPixels / columnWidthDp).toInt()
+    }
+
+    private fun executeNewQuery(query: String) {
+        viewModel.onTriggerEvent(CatalogEvent.UpdateQuery(query))
+        viewModel.onTriggerEvent(CatalogEvent.NewSearch)
     }
 }

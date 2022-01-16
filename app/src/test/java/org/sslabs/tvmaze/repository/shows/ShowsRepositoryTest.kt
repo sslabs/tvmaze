@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
 import org.sslabs.tvmaze.data.api.ShowsResponses.emptyArray
+import org.sslabs.tvmaze.data.api.ShowsResponses.successWith10ShowSearchResults
 import org.sslabs.tvmaze.data.api.ShowsResponses.successWith10Shows
 import org.sslabs.tvmaze.data.api.ShowsResponses.successWith1Show
 import org.sslabs.tvmaze.data.api.TvMazeApi
@@ -292,6 +293,144 @@ class ShowsRepositoryTest {
         assertEquals("All data shall be emitted", 10, emissions[1].data?.size)
         assertNotNull(emissions[1].data?.get(0))
         assertTrue("Emitted data type shall be Show", emissions[1].data?.get(0) is Show)
+        assertEquals("Shall have emitted 2 times", 2, emissions.size)
+    }
+
+    @Test
+    fun `searchShows() on success first emission shall be loading equals to true`() = runBlocking {
+        // Arrange
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_OK)
+                .setBody(successWith10ShowSearchResults)
+        )
+
+        // Act
+        val emissions = showsRepository.searchShows("dummy").toList()
+
+        // Assert
+        assertTrue("First emission shall be loading", emissions.first().isLoading)
+    }
+
+    @Test
+    fun `searchShows() on success last emission shall be loading equals to false`() = runBlocking {
+        // Arrange
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_OK)
+                .setBody(successWith10ShowSearchResults)
+        )
+
+        // Act
+        val emissions = showsRepository.searchShows("dummy").toList()
+
+        // Assert
+        assertFalse("First emission shall be loading", emissions.last().isLoading)
+    }
+
+    @Test
+    fun `searchShows() on failure first emission shall be loading equals to true`() = runBlocking {
+        // Arrange
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST)
+        )
+
+        // Act
+        val emissions = showsRepository.searchShows("dummy").toList()
+
+        // Assert
+        assertTrue("First emission shall be loading", emissions.first().isLoading)
+    }
+
+    @Test
+    fun `searchShows() on failure last emission shall be loading equals to false`() = runBlocking {
+        // Arrange
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST)
+        )
+
+        // Act
+        val emissions = showsRepository.searchShows("dummy").toList()
+
+        // Assert
+        assertFalse("First emission shall be loading", emissions.last().isLoading)
+    }
+
+    @Test
+    fun `searchShows() successfully retrieve 0 results`() = runBlocking {
+        // Arrange
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_OK)
+                .setBody(emptyArray)
+        )
+
+        // Act
+        val emissions = showsRepository.searchShows("dummy").toList()
+
+        // Assert
+        val cachedData = showDaoMock.getAll()
+        assertTrue("Shall be no cache", cachedData.isEmpty())
+        assertEquals("No data shall be in cache", 0, cachedData.size)
+        assertEquals("No data shall be emitted", 0, emissions[1].data?.size)
+    }
+
+    @Test
+    fun `searchShows() successfully retrieve 10 results`() = runBlocking {
+        // Arrange
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_OK)
+                .setBody(successWith10ShowSearchResults)
+        )
+
+        // Act
+        val emissions = showsRepository.searchShows("dummy").toList()
+
+        // Assert
+        val cachedData = showDaoMock.queryIdIn(
+            listOf(
+                12918,
+                27124,
+                13991,
+                32965,
+                57603,
+                57586,
+                22677,
+                22253,
+                3307,
+                15942
+            )
+        )
+        assertEquals("All data shall be in cache", 10, cachedData.size)
+        assertEquals("All data shall be emitted", 10, emissions[1].data?.size)
+        assertNotNull(emissions[1].data?.get(0))
+        assertTrue("Emitted data type shall be Show", emissions[1].data?.get(0) is Show)
+        assertEquals("Shall have emitted 2 times", 2, emissions.size)
+    }
+
+    @Test
+    fun `searchShows() fails when get a random error`() = runBlocking {
+        // Arrange
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST)
+        )
+
+        // Act
+        val emissions = showsRepository.searchShows("dummy").toList()
+
+        // Assert
+        val cachedData = showDaoMock.getAll()
+        assertTrue("Shall be no cache", cachedData.isEmpty())
+
+        assertNull("Shall be no data", emissions[1].data)
+        assertTrue(
+            "State message type shall be Error",
+            emissions[1].stateMessage?.response?.messageType is MessageType.Error
+        )
         assertEquals("Shall have emitted 2 times", 2, emissions.size)
     }
 

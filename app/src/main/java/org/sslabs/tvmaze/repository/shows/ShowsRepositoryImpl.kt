@@ -51,4 +51,17 @@ class ShowsRepositoryImpl @Inject constructor(
     }.catch { e ->
         emit(handleUseCaseException(e))
     }
+
+    override fun searchShows(query: String) = flow {
+        emit(DataState.loading())
+        val apiShows = tvMazeApi.searchShows(query).map { it.show!! }
+        val shows = showApiMapper.mapFromEntityList(apiShows)
+        var cacheShows = showCacheMapper.mapToEntityList(shows)
+        cacheShows.forEach { showDao.insert(it) }
+        val apiIds = apiShows.map { it.id }
+        cacheShows = showDao.queryIdIn(apiIds)
+        emit(DataState.data(response = null, data = showCacheMapper.mapFromEntityList(cacheShows)))
+    }.catch { e ->
+        emit(handleUseCaseException(e))
+    }
 }
