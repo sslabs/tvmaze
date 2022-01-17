@@ -168,7 +168,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
 
     private fun calculateSpanCount(): Int {
         val displayMetrics = resources.displayMetrics
-        val columnWidthDp = resources.getDimension(R.dimen.card_width)
+        val columnWidthDp = resources.getDimension(R.dimen.card_show_width)
 
         return floor(displayMetrics.widthPixels / columnWidthDp).toInt()
     }

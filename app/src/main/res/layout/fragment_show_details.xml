@@ -12,15 +12,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/fragment_show_details_card_margin"
         android:layout_marginStart="@dimen/fragment_show_details_card_margin"
-        app:cardElevation="@dimen/fragment_show_details_card_elevation"
+        app:cardElevation="@dimen/card_elevation"
         app:cardPreventCornerOverlap="false"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/item_show_poster"
-            android:layout_width="@dimen/card_width"
-            android:layout_height="@dimen/card_height"
+            android:layout_width="@dimen/card_show_width"
+            android:layout_height="@dimen/card_show_height"
             android:adjustViewBounds="true"
             android:scaleType="fitXY"
             tools:src="@drawable/sample_poster_medium"/>

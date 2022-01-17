@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="catalog_item_padding_top">16dp</dimen>
-    <dimen name="card_width">185dp</dimen>
-    <dimen name="card_height">260dp</dimen>
+    <dimen name="card_show_width">185dp</dimen>
+    <dimen name="card_show_height">260dp</dimen>
     <dimen name="card_title_margins">16dp</dimen>
     <dimen name="fragment_episodes_title_margin">16dp</dimen>
     <dimen name="fragment_show_details_card_margin">8dp</dimen>
-    <dimen name="fragment_show_details_card_elevation">8dp</dimen>
+    <dimen name="card_elevation">8dp</dimen>
     <dimen name="fragment_show_details_chip_group_margin_top">16dp</dimen>
     <dimen name="fragment_show_details_chip_group_margin_horizontal">8dp</dimen>
     <dimen name="fragment_show_details_summary_margin">16dp</dimen>
@@ -17,4 +17,9 @@
     <dimen name="show_schedule_layout_days_margin_end">8dp</dimen>
     <dimen name="show_schedule_layout_at_margin">8dp</dimen>
     <dimen name="show_schedule_layout_time_margin">1dp</dimen>
+    <dimen name="episode_details_title_margin_top">16dp</dimen>
+    <dimen name="episode_details_title_margin_horizontal">8dp</dimen>
+    <dimen name="episode_details_card_margin_top">20dp</dimen>
+    <dimen name="episode_details_card_margin_horizontal">8dp</dimen>
+    <dimen name="episode_details_summary_margin">16dp</dimen>
 </resources>

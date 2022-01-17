@@ -23,5 +23,18 @@
             android:name="show"
             app:argType="org.sslabs.tvmaze.data.model.Show"
             app:nullable="false"/>
+        <action
+            android:id="@+id/action_showFragment_to_episodeDetailsFragment"
+            app:destination="@id/episodeDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/episodeDetailsFragment"
+        android:name="org.sslabs.tvmaze.ui.episodedetails.EpisodeDetailsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_episode_details">
+        <argument
+            android:name="episode"
+            app:argType="org.sslabs.tvmaze.data.model.Episode"
+            app:nullable="false"/>
     </fragment>
 </navigation>

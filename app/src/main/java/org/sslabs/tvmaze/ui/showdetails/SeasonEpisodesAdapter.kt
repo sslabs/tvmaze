@@ -7,13 +7,16 @@ import org.sslabs.tvmaze.R
 import org.sslabs.tvmaze.data.model.Episode
 import org.sslabs.tvmaze.databinding.ItemSeasonEpisodeBinding
 
-class SeasonEpisodesAdapter : RecyclerView.Adapter<SeasonEpisodeViewHolder>() {
+class SeasonEpisodesAdapter(
+    private val itemInteraction: SeasonEpisodeViewHolder.Interaction
+) : RecyclerView.Adapter<SeasonEpisodeViewHolder>() {
 
     private val seasonEpisodeList = mutableListOf<Episode>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SeasonEpisodeViewHolder =
         SeasonEpisodeViewHolder(
-            ItemSeasonEpisodeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemSeasonEpisodeBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            itemInteraction
         )
 
     override fun onBindViewHolder(holder: SeasonEpisodeViewHolder, position: Int) {
@@ -32,15 +35,24 @@ class SeasonEpisodesAdapter : RecyclerView.Adapter<SeasonEpisodeViewHolder>() {
 }
 
 class SeasonEpisodeViewHolder(
-    private val itemBinding: ItemSeasonEpisodeBinding
+    private val itemBinding: ItemSeasonEpisodeBinding,
+    private val interaction: Interaction
 ) : RecyclerView.ViewHolder(itemBinding.root) {
 
     fun bind(episode: Episode) {
-        val title = itemBinding.root.context.getString(
-            R.string.season_episode_name,
-            episode.number,
-            episode.name
-        )
-        itemBinding.episodeTitle.text = title
+        itemBinding.episodeTitle.apply {
+            text = itemBinding.root.context.getString(
+                R.string.season_episode_name,
+                episode.number,
+                episode.name
+            )
+            setOnClickListener {
+                interaction.onEpisodeSelected(adapterPosition, episode)
+            }
+        }
+    }
+
+    interface Interaction {
+        fun onEpisodeSelected(position: Int, item: Episode)
     }
 }

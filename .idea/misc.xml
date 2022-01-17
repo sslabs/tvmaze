@@ -5,6 +5,7 @@
       <map>
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_catalog.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_episode_details.xml" value="0.37604166666666666" />
         <entry key="app/src/main/res/layout/fragment_episodes.xml" value="0.37604166666666666" />
         <entry key="app/src/main/res/layout/fragment_season.xml" value="0.37604166666666666" />
         <entry key="app/src/main/res/layout/fragment_show.xml" value="0.18" />

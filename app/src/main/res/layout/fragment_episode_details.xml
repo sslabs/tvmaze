@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/episode_details_title"
+                style="@style/Subtitle2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/episode_details_title_margin_top"
+                android:layout_marginHorizontal="@dimen/episode_details_title_margin_horizontal"
+                tools:text="Cars, Buses and Lawnmowers"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/episode_details_card_margin_top"
+                android:layout_marginHorizontal="@dimen/episode_details_card_margin_horizontal"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardPreventCornerOverlap="false">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/episode_details_poster"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    tools:src="@drawable/sample_episode_poster_original"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/show_details_summary"
+                style="@style/Body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:justificationMode="inter_word"
+                tools:text="Kirby learns about a character design contest featuring the ultimate prize - a chance to meet idol Mac McCallister and debut an animated character on TV. He plans to attend with Fish and Eli, but when they unexpectedly get stranded at school hours before the contest, they devise a plan that accidently places them in the middle of Clown Town, an abandoned area of the city where creepy clowns reign. Meanwhile, Dawn realizes Kirby is using an embarrassing drawing of her titled Dawnzilla as his submission for the contest, so she and Belinda do everything in their power to stop him."/>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

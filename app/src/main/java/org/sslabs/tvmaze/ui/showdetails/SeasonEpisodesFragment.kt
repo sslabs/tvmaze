@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import dagger.hilt.android.AndroidEntryPoint
 import org.sslabs.tvmaze.data.model.Episode
 import org.sslabs.tvmaze.databinding.FragmentSeasonBinding
+import org.sslabs.tvmaze.ui.base.BaseFragment
 import java.io.Serializable
 
-class SeasonEpisodesFragment : Fragment() {
+@AndroidEntryPoint
+class SeasonEpisodesFragment : BaseFragment(), SeasonEpisodeViewHolder.Interaction {
 
     companion object {
         private const val EPISODES = "episodes"
@@ -39,9 +41,17 @@ class SeasonEpisodesFragment : Fragment() {
 
         arguments?.takeIf { it.containsKey(EPISODES) }?.apply {
             val episodes = getSerializable(EPISODES) as List<Episode>
-            adapter = SeasonEpisodesAdapter()
+            adapter = SeasonEpisodesAdapter(this@SeasonEpisodesFragment)
             adapter.submitData(episodes)
             binding.seasonEpisodesList.adapter = adapter
         }
+    }
+
+    override fun onEpisodeSelected(position: Int, item: Episode) {
+        navigateToEpisodeDetails(item)
+    }
+
+    private fun navigateToEpisodeDetails(episode: Episode) {
+        screensNavigator.fromShowToEpisode(episode)
     }
 }
