@@ -82,6 +82,12 @@ dependencies {
     implementation "androidx.navigation:navigation-dynamic-features-fragment:$navigation"
     androidTestImplementation "androidx.navigation:navigation-testing:$navigation"
 
+    // Biometric
+    implementation "androidx.biometric:biometric:$biometric"
+
+    // Preference
+    implementation "androidx.preference:preference-ktx:$preference"
+
     // Data store
     implementation "androidx.datastore:datastore-preferences:$datastore"
 

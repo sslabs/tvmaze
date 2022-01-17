@@ -7,4 +7,6 @@ interface IScreensNavigator {
     fun fromCatalogToShowDetails(show: Show)
 
     fun fromShowToEpisode(episode: Episode)
+
+    fun toSettings()
 }

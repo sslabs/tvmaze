@@ -18,7 +18,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ShowDetailsFragment : BaseFragment() {
 
-    private lateinit var binding: FragmentShowDetailsBinding
+    private var _binding: FragmentShowDetailsBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: EpisodesViewModel by viewModels(
         ownerProducer = { requireParentFragment() }
     )
@@ -31,7 +32,7 @@ class ShowDetailsFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentShowDetailsBinding.inflate(inflater, container, false)
+        _binding = FragmentShowDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -39,6 +40,11 @@ class ShowDetailsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initViews()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun initViews() {
@@ -87,8 +93,10 @@ class ShowDetailsFragment : BaseFragment() {
 
     private fun initSummary() {
         viewModel.state.value?.let { state ->
-            binding.showDetailsSummary.text =
-                Html.fromHtml(state.show.summary, Html.FROM_HTML_MODE_COMPACT)
+            state.show.summary?.let {
+                binding.showDetailsSummary.text =
+                    Html.fromHtml(it, Html.FROM_HTML_MODE_COMPACT)
+            }
         }
     }
 }

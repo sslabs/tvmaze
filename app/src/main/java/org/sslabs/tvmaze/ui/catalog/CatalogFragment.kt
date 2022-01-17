@@ -27,7 +27,9 @@ import kotlin.math.floor
 @AndroidEntryPoint
 class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
 
-    private lateinit var binding: FragmentCatalogBinding
+    private var _binding: FragmentCatalogBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel: CatalogViewModel by viewModels()
     private lateinit var searchView: SearchView
     private lateinit var menu: Menu
@@ -40,7 +42,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCatalogBinding.inflate(inflater, container, false)
+        _binding = FragmentCatalogBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -56,6 +58,21 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         this.menu = menu
         inflater.inflate(R.menu.catalog_menu, this.menu)
         initSearchView()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.catalog_menu_action_settings -> {
+                navigateToSettings()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onCatalogItemSelected(position: Int, item: Show) {
@@ -180,5 +197,9 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
 
     private fun navigateToShowDetails(show: Show) {
         screensNavigator.fromCatalogToShowDetails(show)
+    }
+
+    private fun navigateToSettings() {
+        screensNavigator.toSettings()
     }
 }

@@ -37,4 +37,13 @@
             app:argType="org.sslabs.tvmaze.data.model.Episode"
             app:nullable="false"/>
     </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="org.sslabs.tvmaze.ui.SettingsFragment"
+        android:label="SettingsFragment" />
+
+    <!-- Global actions -->
+    <action
+        android:id="@+id/openSettingsFragment"
+        app:destination="@id/settingsFragment" />
 </navigation>

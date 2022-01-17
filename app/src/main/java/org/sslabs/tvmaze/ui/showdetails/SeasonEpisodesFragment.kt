@@ -25,14 +25,15 @@ class SeasonEpisodesFragment : BaseFragment(), SeasonEpisodeViewHolder.Interacti
     }
 
     private lateinit var adapter: SeasonEpisodesAdapter
-    private lateinit var binding: FragmentSeasonBinding
+    private var _binding: FragmentSeasonBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSeasonBinding.inflate(inflater, container, false)
+        _binding = FragmentSeasonBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -45,6 +46,11 @@ class SeasonEpisodesFragment : BaseFragment(), SeasonEpisodeViewHolder.Interacti
             adapter.submitData(episodes)
             binding.seasonEpisodesList.adapter = adapter
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onEpisodeSelected(position: Int, item: Episode) {

@@ -4,12 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <item android:id="@+id/catalog_menu_action_search"
-        android:icon="@android:drawable/ic_menu_search"
-        android:title="@string/menu_title_search"
-        app:showAsAction="always"
-        app:actionViewClass="androidx.appcompat.widget.SearchView" />
-
     <item android:id="@+id/catalog_menu_action_settings"
         android:title="@string/menu_title_settings"
         app:showAsAction="never"/>

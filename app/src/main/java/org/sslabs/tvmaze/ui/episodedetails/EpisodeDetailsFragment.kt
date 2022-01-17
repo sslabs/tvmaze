@@ -2,9 +2,7 @@ package org.sslabs.tvmaze.ui.episodedetails
 
 import android.os.Bundle
 import android.text.Html
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -18,7 +16,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class EpisodeDetailsFragment : BaseFragment() {
 
-    private lateinit var binding: FragmentEpisodeDetailsBinding
+    private var _binding: FragmentEpisodeDetailsBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var menu: Menu
     private val viewModel: EpisodeDetailsViewModel by viewModels()
 
     @Inject
@@ -29,7 +30,7 @@ class EpisodeDetailsFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentEpisodeDetailsBinding.inflate(inflater, container, false)
+        _binding = FragmentEpisodeDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -39,7 +40,29 @@ class EpisodeDetailsFragment : BaseFragment() {
         init()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        this.menu = menu
+        inflater.inflate(R.menu.default_menu, this.menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.catalog_menu_action_settings -> {
+                navigateToSettings()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun init() {
+        setHasOptionsMenu(true)
         uiCommunicationListener.setToolbarExpanded(true)
         viewModel.state.value?.let { episode ->
             uiCommunicationListener.setToolbarTitle(
@@ -57,5 +80,9 @@ class EpisodeDetailsFragment : BaseFragment() {
                 binding.showDetailsSummary.text = Html.fromHtml(it, Html.FROM_HTML_MODE_COMPACT)
             }
         }
+    }
+
+    private fun navigateToSettings() {
+        screensNavigator.toSettings()
     }
 }

@@ -16,7 +16,9 @@ import org.sslabs.tvmaze.util.processQueue
 @AndroidEntryPoint
 class EpisodesFragment : BaseFragment() {
 
-    private lateinit var binding: FragmentEpisodesBinding
+    private var _binding: FragmentEpisodesBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var adapter: SeasonPageAdapter
     private val viewModel: EpisodesViewModel by viewModels(
         ownerProducer = { requireParentFragment() }
@@ -27,7 +29,7 @@ class EpisodesFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentEpisodesBinding.inflate(inflater, container, false)
+        _binding = FragmentEpisodesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -36,6 +38,11 @@ class EpisodesFragment : BaseFragment() {
 
         initViews()
         observeData()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun initViews() {

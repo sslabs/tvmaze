@@ -64,3 +64,7 @@ object EpisodeDbConstants {
     const val SUMMARY = "summary"
     const val IMAGE = "image"
 }
+
+object SettingsKeys {
+    const val AUTH_SETTING_KEY = "authentication"
+}
