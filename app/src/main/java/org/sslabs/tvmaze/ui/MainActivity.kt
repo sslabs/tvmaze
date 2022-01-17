@@ -55,6 +55,11 @@ class MainActivity : AppCompatActivity(), UICommunicationListener, DeviceAuthent
         binding.appToolbar.title = title
     }
 
+    override fun displayHomeAsUp(isDisplayHomeAsUp: Boolean) {
+        supportActionBar?.setDisplayHomeAsUpEnabled(isDisplayHomeAsUp)
+        supportActionBar?.setHomeAsUpIndicator(null)
+    }
+
     override fun onAuthenticationSucceeded() {
         // Ignore
     }

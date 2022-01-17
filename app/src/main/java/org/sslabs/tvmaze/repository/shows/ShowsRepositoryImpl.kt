@@ -64,4 +64,22 @@ class ShowsRepositoryImpl @Inject constructor(
     }.catch { e ->
         emit(handleUseCaseException(e))
     }
+
+    override fun toggleShowFavorite(show: Show) = flow {
+        val toggle = show.copy(favorite = show.favorite?.not())
+        var cacheToggle = showCacheMapper.toEntity(toggle)
+        showDao.update(cacheToggle)
+        cacheToggle = showDao.getById(show.id)
+        emit(DataState.data(response = null, data = showCacheMapper.fromEntity(cacheToggle)))
+    }.catch { e ->
+        emit(handleUseCaseException(e))
+    }
+
+    override fun getFavorites() = flow {
+        emit(DataState.loading())
+        val favorites = showDao.queryFavorites(isFavorite = true)
+        emit(DataState.data(response = null, data = showCacheMapper.mapFromEntityList(favorites)))
+    }.catch { e ->
+        emit(handleUseCaseException(e))
+    }
 }

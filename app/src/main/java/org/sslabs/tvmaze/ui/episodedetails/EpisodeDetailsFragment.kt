@@ -48,7 +48,7 @@ class EpisodeDetailsFragment : BaseFragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.catalog_menu_action_settings -> {
+            R.id.default_menu_action_settings -> {
                 navigateToSettings()
                 true
             }

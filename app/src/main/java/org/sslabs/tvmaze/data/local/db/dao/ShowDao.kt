@@ -1,9 +1,6 @@
 package org.sslabs.tvmaze.data.local.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import org.sslabs.tvmaze.ShowDbConstants
 import org.sslabs.tvmaze.data.local.db.entity.ShowCacheEntity
 
@@ -18,6 +15,23 @@ interface ShowDao {
 
     @Query("SELECT * FROM ${ShowDbConstants.TABLE_NAME} ORDER BY ${ShowDbConstants.ID} ASC")
     suspend fun getAll(): List<ShowCacheEntity>
+
+    @Query("""
+        SELECT *
+        FROM ${ShowDbConstants.TABLE_NAME}
+        WHERE ${ShowDbConstants.ID} = :id""")
+    suspend fun getById(id: Int): ShowCacheEntity
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(show: ShowCacheEntity)
+
+    @Query("""
+        SELECT *
+        FROM ${ShowDbConstants.TABLE_NAME}
+        WHERE ${ShowDbConstants.FAVORITE} = :isFavorite
+        ORDER BY ${ShowDbConstants.NAME} ASC
+    """)
+    suspend fun queryFavorites(isFavorite: Boolean = true): List<ShowCacheEntity>
 
     @Query("""
         SELECT *

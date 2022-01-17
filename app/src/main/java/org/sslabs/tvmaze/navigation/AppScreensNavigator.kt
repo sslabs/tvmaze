@@ -9,6 +9,12 @@ import org.sslabs.tvmaze.ui.showdetails.ShowFragmentDirections
 
 class AppScreensNavigator(private val navController: NavController) : IScreensNavigator {
 
+    override fun fromCatalogToSelf(displayFavorites: Boolean) {
+        navController.navigate(
+            CatalogFragmentDirections.actionCatalogFragmentSelf(displayFavorites)
+        )
+    }
+
     override fun fromCatalogToShowDetails(show: Show) {
         navController.navigate(
             CatalogFragmentDirections.actionCatalogFragmentToShowFragment(

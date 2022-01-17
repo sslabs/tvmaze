@@ -1,9 +1,6 @@
 package org.sslabs.tvmaze.ui.catalog
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -19,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CatalogViewModel @Inject constructor(
-    private val showsRepository: IShowsRepository
+    private val showsRepository: IShowsRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _state: MutableLiveData<CatalogState> = MutableLiveData(CatalogState())
@@ -27,7 +25,19 @@ class CatalogViewModel @Inject constructor(
         get() = _state
 
     init {
-        onTriggerEvent(CatalogEvent.Index)
+        val isLoadFavorites =
+            CatalogFragmentArgs.fromSavedStateHandle(savedStateHandle).showFavorites
+            _state.value?.let { state ->
+                if (state.isFavorites != isLoadFavorites) {
+                    _state.value = state.copy(isFavorites = isLoadFavorites)
+                }
+            }
+
+        if (isLoadFavorites) {
+            onTriggerEvent(CatalogEvent.Favorites)
+        } else {
+            onTriggerEvent(CatalogEvent.Index)
+        }
     }
 
     fun onTriggerEvent(event: CatalogEvent) {
@@ -40,6 +50,9 @@ class CatalogViewModel @Inject constructor(
             }
             is CatalogEvent.NextPage -> {
                 nextPage()
+            }
+            is CatalogEvent.Favorites -> {
+                loadFavorites()
             }
             is CatalogEvent.OnRemoveHeadFromQueue -> {
                 removeHeadFromQueue()
@@ -108,6 +121,22 @@ class CatalogViewModel @Inject constructor(
     private fun nextPage() {
         incrementPageNumber()
         index()
+    }
+
+    private fun loadFavorites() {
+        _state.value?.let { state ->
+            showsRepository.getFavorites().onEach { dataState ->
+                this._state.value = state.copy(isLoading = dataState.isLoading)
+
+                dataState.data?.let { list ->
+                    this._state.value = state.copy(catalog = list)
+                }
+
+                dataState.stateMessage?.let { stateMessage ->
+                    appendToMessageQueue(stateMessage)
+                }
+            }.launchIn(viewModelScope)
+        }
     }
 
     private fun incrementPageNumber() {

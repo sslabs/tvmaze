@@ -50,7 +50,6 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         super.onViewCreated(view, savedInstanceState)
 
         initViews()
-        observeData()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -58,12 +57,17 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         this.menu = menu
         inflater.inflate(R.menu.catalog_menu, this.menu)
         initSearchView()
+        observeData()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.catalog_menu_action_settings -> {
                 navigateToSettings()
+                true
+            }
+            R.id.catalog_menu_action_show_favorites -> {
+                showFavorites()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -107,6 +111,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
                         && viewModel.state.value?.isLoading == false
                         && viewModel.state.value?.isQueryExhausted == false
                         && viewModel.state.value?.query?.isEmpty() == true
+                        && viewModel.state.value?.isFavorites == false
                     ) {
                         Timber.d("BlogFragment: attempting to load next page...")
                         viewModel.onTriggerEvent(CatalogEvent.NextPage)
@@ -167,6 +172,8 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
 
             uiCommunicationListener.displayProgressBar(state.isLoading)
 
+            configureLayout()
+
             processQueue(
                 context = context,
                 queue = state.queue,
@@ -195,11 +202,28 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         viewModel.onTriggerEvent(CatalogEvent.NewSearch)
     }
 
+    private fun configureLayout() {
+        if (viewModel.state.value?.isFavorites == true) {
+            uiCommunicationListener.setToolbarTitle(getString(R.string.toolbar_title_favorites))
+            uiCommunicationListener.displayHomeAsUp(true)
+            menu.findItem(R.id.catalog_menu_action_show_favorites).isVisible = false
+            menu.findItem(R.id.catalog_menu_action_search).isVisible = false
+        } else {
+            uiCommunicationListener.setToolbarTitle(getString(R.string.app_name))
+            menu.findItem(R.id.catalog_menu_action_show_favorites).isVisible = true
+            menu.findItem(R.id.catalog_menu_action_search).isVisible = true
+        }
+    }
+
     private fun navigateToShowDetails(show: Show) {
         screensNavigator.fromCatalogToShowDetails(show)
     }
 
     private fun navigateToSettings() {
         screensNavigator.toSettings()
+    }
+
+    private fun showFavorites() {
+        screensNavigator.fromCatalogToSelf(true)
     }
 }

@@ -9,5 +9,6 @@ data class Show(
     val time: String?,
     val days: List<String>?,
     val genres: List<String>?,
-    val summary: String?
+    val summary: String?,
+    val favorite: Boolean?
 ) : Serializable

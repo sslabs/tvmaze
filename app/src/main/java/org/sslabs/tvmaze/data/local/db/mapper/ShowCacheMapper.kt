@@ -14,7 +14,8 @@ class ShowCacheMapper @Inject constructor() : EntityMapper<ShowCacheEntity, Show
         time = entity.time,
         days = entity.days?.split(",")?.toList(),
         genres = entity.genres?.split(",")?.toList(),
-        summary = entity.summary
+        summary = entity.summary,
+        favorite = entity.favorite
     )
 
     override fun toEntity(domainModel: Show) = ShowCacheEntity(
@@ -24,6 +25,7 @@ class ShowCacheMapper @Inject constructor() : EntityMapper<ShowCacheEntity, Show
         time = domainModel.time,
         days = domainModel.days?.joinToString(separator = ","),
         genres = domainModel.genres?.joinToString(separator = ","),
-        summary = domainModel.summary
+        summary = domainModel.summary,
+        favorite = domainModel.favorite
     )
 }

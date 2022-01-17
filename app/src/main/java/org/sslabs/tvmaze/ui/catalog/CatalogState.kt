@@ -6,6 +6,7 @@ import org.sslabs.tvmaze.util.StateMessage
 
 data class CatalogState(
     val isLoading: Boolean = false,
+    val isFavorites: Boolean = false,
     val catalog: List<Show> = listOf(),
     val page: Int = 0,
     val query: String = "",

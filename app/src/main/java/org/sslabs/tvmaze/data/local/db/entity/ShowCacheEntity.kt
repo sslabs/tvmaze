@@ -27,5 +27,8 @@ data class ShowCacheEntity(
     var genres: String?,
 
     @ColumnInfo(name = ShowDbConstants.SUMMARY)
-    var summary: String?
+    var summary: String?,
+
+    @ColumnInfo(name = ShowDbConstants.FAVORITE)
+    var favorite: Boolean?
 )

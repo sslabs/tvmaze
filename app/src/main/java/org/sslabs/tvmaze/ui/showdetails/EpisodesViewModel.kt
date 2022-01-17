@@ -5,6 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.sslabs.tvmaze.repository.episode.IEpisodeRepository
+import org.sslabs.tvmaze.repository.shows.IShowsRepository
 import org.sslabs.tvmaze.util.StateMessage
 import org.sslabs.tvmaze.util.UIComponentType
 import org.sslabs.tvmaze.util.doesMessageAlreadyExistInQueue
@@ -13,6 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EpisodesViewModel @Inject constructor(
+    private val showsRepository: IShowsRepository,
     private val episodeRepository: IEpisodeRepository,
     savedState: SavedStateHandle
 ) : ViewModel() {
@@ -35,6 +37,9 @@ class EpisodesViewModel @Inject constructor(
             is EpisodesEvent.SearchEpisodes -> {
                 searchEpisodes()
             }
+            is EpisodesEvent.ToggleFavoriteShow -> {
+                toggleShowFavorite()
+            }
             is EpisodesEvent.OnRemoveHeadFromQueue -> {
                 removeHeadFromQueue()
             }
@@ -51,6 +56,22 @@ class EpisodesViewModel @Inject constructor(
 
                 dataState.data?.let { episodes ->
                     this._state.value = state.copy(episodes = episodes)
+                }
+
+                dataState.stateMessage?.let { stateMessage ->
+                    appendToMessageQueue(stateMessage)
+                }
+            }.launchIn(viewModelScope)
+        }
+    }
+
+    private fun toggleShowFavorite() {
+        _state.value?.let { state ->
+            showsRepository.toggleShowFavorite(state.show).onEach { dataState ->
+                _state.value = state.copy(isLoading = dataState.isLoading)
+
+                dataState.data?.let { show ->
+                    _state.value = state.copy(show = show)
                 }
 
                 dataState.stateMessage?.let { stateMessage ->

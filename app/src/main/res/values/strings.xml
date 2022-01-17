@@ -20,4 +20,7 @@
     <string name="not_authorized">Not authorized</string>
     <string name="authenticator_description">The app is locked. If you want to stop locking it, please grant access and change the in-app setting</string>
     <string name="authenticator_none_enrolled">You need to enroll a security option prior using this feature</string>
+    <string name="menu_title_favorite">Favorite</string>
+    <string name="toolbar_title_favorites">Favorites</string>
+    <string name="menu_title_my_favorites">My favorites</string>
 </resources>

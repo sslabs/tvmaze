@@ -13,6 +13,13 @@
         <action
             android:id="@+id/action_catalogFragment_to_showFragment"
             app:destination="@id/showFragment" />
+        <action
+            android:id="@+id/action_catalogFragment_self"
+            app:destination="@id/catalogFragment" />
+        <argument
+            android:name="showFavorites"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/showFragment"

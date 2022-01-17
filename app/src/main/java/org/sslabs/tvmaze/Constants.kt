@@ -52,6 +52,7 @@ object ShowDbConstants {
     const val DAYS = "days"
     const val GENRES = "genres"
     const val SUMMARY = "summary"
+    const val FAVORITE = "favorite"
 }
 
 object EpisodeDbConstants {

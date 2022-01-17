@@ -10,6 +10,8 @@ sealed class CatalogEvent {
 
     object NextPage : CatalogEvent()
 
+    object Favorites : CatalogEvent()
+
     data class UpdateQuery(val query: String): CatalogEvent()
 
     object OnRemoveHeadFromQueue : CatalogEvent()

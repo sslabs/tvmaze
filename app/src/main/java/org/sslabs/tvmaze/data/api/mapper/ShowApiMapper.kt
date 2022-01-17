@@ -15,7 +15,8 @@ class ShowApiMapper @Inject constructor() : EntityMapper<ShowApiEntity, Show> {
             time = entity.schedule?.time,
             days = entity.schedule?.days,
             genres = entity.genres,
-            summary = entity.summary
+            summary = entity.summary,
+            favorite = false
         )
     }
 

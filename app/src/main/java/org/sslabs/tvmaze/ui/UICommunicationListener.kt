@@ -7,4 +7,6 @@ interface UICommunicationListener {
     fun setToolbarExpanded(isCollapsable: Boolean)
 
     fun setToolbarTitle(title: String?)
+
+    fun displayHomeAsUp(isDisplayHomeAsUp: Boolean)
 }
