@@ -27,11 +27,11 @@ class CatalogViewModel @Inject constructor(
     init {
         val isLoadFavorites =
             CatalogFragmentArgs.fromSavedStateHandle(savedStateHandle).showFavorites
-            _state.value?.let { state ->
-                if (state.isFavorites != isLoadFavorites) {
-                    _state.value = state.copy(isFavorites = isLoadFavorites)
-                }
+        _state.value?.let { state ->
+            if (state.isFavorites != isLoadFavorites) {
+                _state.value = state.copy(isFavorites = isLoadFavorites)
             }
+        }
 
         if (isLoadFavorites) {
             onTriggerEvent(CatalogEvent.Favorites)
