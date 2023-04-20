@@ -3,6 +3,8 @@ package org.sslabs.tvmaze.ui.episodedetails
 import android.os.Bundle
 import android.text.Html
 import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -40,29 +42,13 @@ class EpisodeDetailsFragment : BaseFragment() {
         init()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        this.menu = menu
-        inflater.inflate(R.menu.default_menu, this.menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.default_menu_action_settings -> {
-                navigateToSettings()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     private fun init() {
-        setHasOptionsMenu(true)
+        initMenu()
         uiCommunicationListener.setToolbarExpanded(true)
         viewModel.state.value?.let { episode ->
             uiCommunicationListener.setToolbarTitle(
@@ -80,6 +66,26 @@ class EpisodeDetailsFragment : BaseFragment() {
                 binding.showDetailsSummary.text = Html.fromHtml(it, Html.FROM_HTML_MODE_COMPACT)
             }
         }
+    }
+
+    private fun initMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                this@EpisodeDetailsFragment.menu = menu
+                menuInflater.inflate(R.menu.default_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.default_menu_action_settings -> {
+                        navigateToSettings()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        })
     }
 
     private fun navigateToSettings() {

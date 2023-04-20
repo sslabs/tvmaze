@@ -3,6 +3,8 @@ package org.sslabs.tvmaze.util
 import android.content.Context
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.core.view.MenuHost
+import androidx.fragment.app.Fragment
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.google.android.material.snackbar.Snackbar
@@ -201,3 +203,5 @@ fun Context.displayToast(
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     stateMessageCallback.removeMessageFromStack()
 }
+
+fun Fragment.menuHost(): MenuHost = requireActivity()

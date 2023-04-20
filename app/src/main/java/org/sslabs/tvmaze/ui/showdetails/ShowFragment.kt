@@ -1,14 +1,21 @@
 package org.sslabs.tvmaze.ui.showdetails
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import org.sslabs.tvmaze.R
 import org.sslabs.tvmaze.databinding.FragmentShowBinding
 import org.sslabs.tvmaze.ui.base.BaseFragment
 import org.sslabs.tvmaze.util.StateMessageCallback
+import org.sslabs.tvmaze.util.menuHost
 import org.sslabs.tvmaze.util.processQueue
 
 @AndroidEntryPoint
@@ -39,46 +46,51 @@ class ShowFragment : BaseFragment() {
         initViews()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        this.menu = menu
-        inflater.inflate(R.menu.show_menu, this.menu)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        viewModel.state.value?.let { state ->
-            val item = menu.findItem(R.id.show_menu_action_favorite)
-            item.isChecked = state.show.favorite ?: false
-            updateFavoriteState(item)
-        }
-        observeData()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.show_menu_action_settings -> {
-                navigateToSettings()
-                true
-            }
-            R.id.show_menu_action_favorite -> {
-                viewModel.onTriggerEvent(EpisodesEvent.ToggleFavoriteShow)
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     private fun initViews() {
-        setHasOptionsMenu(true)
+        initMenu()
+    }
+
+    private fun initMenu() {
+        menuProvider = object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                this@ShowFragment.menu = menu
+                menuInflater.inflate(R.menu.show_menu, menu)
+                observeData()
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.show_menu_action_settings -> {
+                        navigateToSettings()
+                        true
+                    }
+                    R.id.show_menu_action_favorite -> {
+                        viewModel.onTriggerEvent(EpisodesEvent.ToggleFavoriteShow)
+                        true
+                    }
+                    else -> false
+                }
+            }
+
+            override fun onPrepareMenu(menu: Menu) {
+                viewModel.state.value?.let { state ->
+                    val item = menu.findItem(R.id.show_menu_action_favorite)
+                    item.isChecked = state.show.favorite ?: false
+                    updateFavoriteState(item)
+                }
+            }
+        }.apply {
+            menuHost().addMenuProvider(this)
+        }
     }
 
     private fun observeData() {
-        viewModel.state.observe(viewLifecycleOwner, { state ->
+        viewModel.state.observe(viewLifecycleOwner) { state ->
             uiCommunicationListener.displayProgressBar(state.isLoading)
 
             state.show.let { show ->
@@ -97,7 +109,7 @@ class ShowFragment : BaseFragment() {
                         viewModel.onTriggerEvent(EpisodesEvent.OnRemoveHeadFromQueue)
                     }
                 })
-        })
+        }
     }
 
     private fun forceLoadViewModel() {

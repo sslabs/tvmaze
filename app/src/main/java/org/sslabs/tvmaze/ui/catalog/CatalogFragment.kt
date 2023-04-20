@@ -3,10 +3,16 @@ package org.sslabs.tvmaze.ui.catalog
 import android.app.SearchManager
 import android.content.Context.SEARCH_SERVICE
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +24,7 @@ import org.sslabs.tvmaze.databinding.FragmentCatalogBinding
 import org.sslabs.tvmaze.ui.base.BaseFragment
 import org.sslabs.tvmaze.util.SpacingItemDecoration
 import org.sslabs.tvmaze.util.StateMessageCallback
+import org.sslabs.tvmaze.util.menuHost
 import org.sslabs.tvmaze.util.processQueue
 import timber.log.Timber
 import javax.inject.Inject
@@ -52,28 +59,6 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         initViews()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        this.menu = menu
-        inflater.inflate(R.menu.catalog_menu, this.menu)
-        initSearchView()
-        observeData()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.catalog_menu_action_settings -> {
-                navigateToSettings()
-                true
-            }
-            R.id.catalog_menu_action_show_favorites -> {
-                showFavorites()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -89,7 +74,34 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
     }
 
     private fun initToolbar() {
-        setHasOptionsMenu(true)
+        initMenu()
+    }
+
+    private fun initMenu() {
+        menuProvider = object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                this@CatalogFragment.menu = menu
+                menuInflater.inflate(R.menu.catalog_menu, menu)
+                initSearchView()
+                observeData()
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.catalog_menu_action_settings -> {
+                        navigateToSettings()
+                        true
+                    }
+                    R.id.catalog_menu_action_show_favorites -> {
+                        showFavorites()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }.apply {
+            menuHost().addMenuProvider(this)
+        }
     }
 
     private fun initCatalog() {
@@ -168,7 +180,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
     }
 
     private fun observeData() {
-        viewModel.state.observe(viewLifecycleOwner, { state ->
+        viewModel.state.observe(viewLifecycleOwner) { state ->
 
             uiCommunicationListener.displayProgressBar(state.isLoading)
 
@@ -187,7 +199,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
             adapter.apply {
                 submitList(state.catalog)
             }
-        })
+        }
     }
 
     private fun calculateSpanCount(): Int {
