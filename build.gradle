@@ -3,11 +3,11 @@ buildscript {
     ext {
         targetSdk = 31
         minSdk = 26
-        gradle_version = "7.0.4"
-        kotlin_version = "1.6.0"
-        hilt_version = "2.39"
+        gradle_version = '8.0.0-rc01'
+        kotlin_version = '1.6.21'
+        hilt_version = '2.40.1'
         androidx_hilt = "1.0.0"
-        navigation = "2.4.0-rc01"
+        navigation = '2.5.3'
         androidx_core = "1.7.0"
         appcompat = "1.4.0"
         constraintlayout = "2.1.1"

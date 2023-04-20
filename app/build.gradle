@@ -47,6 +47,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'org.sslabs.tvmaze'
 }
 
 dependencies {
