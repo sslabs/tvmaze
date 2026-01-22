@@ -144,7 +144,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         }
 
         // Enter on computer keyboard or arrow on virtual keyboard
-        val searchPlate = searchView.findViewById(R.id.search_src_text) as EditText
+        val searchPlate: EditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text)
 
         // set initial value of query text after rotation/navigation
         viewModel.state.value?.let { state ->
@@ -165,7 +165,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         }
 
         // Search button clicked in toolbar
-        val searchButton = searchView.findViewById(R.id.search_go_btn) as View
+        val searchButton: View = searchView.findViewById(androidx.appcompat.R.id.search_go_btn)
         searchButton.setOnClickListener {
             val searchQuery = searchPlate.text.toString()
             Timber.i("SearchView: (button) executing search...: $searchQuery")
