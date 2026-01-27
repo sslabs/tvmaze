@@ -438,13 +438,14 @@ class ShowsRepositoryTest {
         (0 until quantitative).forEach {
             showDaoMock.insert(
                 ShowCacheEntity(
-                    it,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    id = it,
+                    name = null,
+                    image = null,
+                    time = null,
+                    days = null,
+                    genres = null,
+                    summary = null,
+                    favorite = false
                 )
             )
         }
