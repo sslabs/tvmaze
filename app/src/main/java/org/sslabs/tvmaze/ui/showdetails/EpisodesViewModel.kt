@@ -1,7 +1,12 @@
 package org.sslabs.tvmaze.ui.showdetails
 
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.sslabs.tvmaze.repository.episode.IEpisodeRepository
@@ -19,14 +24,13 @@ class EpisodesViewModel @Inject constructor(
     savedState: SavedStateHandle
 ) : ViewModel() {
 
-    private val _state: MutableLiveData<EpisodesState> = MutableLiveData(
+    private val _state: MutableStateFlow<EpisodesState> = MutableStateFlow(
         EpisodesState(
             show = ShowFragmentArgs.fromSavedStateHandle(savedState).show
         )
     )
 
-    val state: LiveData<EpisodesState>
-        get() = _state
+    val state: StateFlow<EpisodesState> = _state.asStateFlow()
 
     init {
         onTriggerEvent(EpisodesEvent.SearchEpisodes)
@@ -50,57 +54,53 @@ class EpisodesViewModel @Inject constructor(
     }
 
     private fun searchEpisodes() {
-        _state.value?.let { state ->
-            episodeRepository.getEpisodes(state.show.id).onEach { dataState ->
-                this._state.value = state.copy(isLoading = dataState.isLoading)
+        val current = _state.value
+        episodeRepository.getEpisodes(current.show.id).onEach { dataState ->
+            _state.value = _state.value.copy(isLoading = dataState.isLoading)
 
-                dataState.data?.let { episodes ->
-                    this._state.value = state.copy(episodes = episodes)
-                }
+            dataState.data?.let { episodes ->
+                _state.value = _state.value.copy(episodes = episodes)
+            }
 
-                dataState.stateMessage?.let { stateMessage ->
-                    appendToMessageQueue(stateMessage)
-                }
-            }.launchIn(viewModelScope)
-        }
+            dataState.stateMessage?.let { stateMessage ->
+                appendToMessageQueue(stateMessage)
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun toggleShowFavorite() {
-        _state.value?.let { state ->
-            showsRepository.toggleShowFavorite(state.show).onEach { dataState ->
-                _state.value = state.copy(isLoading = dataState.isLoading)
+        val current = _state.value
+        showsRepository.toggleShowFavorite(current.show).onEach { dataState ->
+            _state.value = _state.value.copy(isLoading = dataState.isLoading)
 
-                dataState.data?.let { show ->
-                    _state.value = state.copy(show = show)
-                }
+            dataState.data?.let { show ->
+                _state.value = _state.value.copy(show = show)
+            }
 
-                dataState.stateMessage?.let { stateMessage ->
-                    appendToMessageQueue(stateMessage)
-                }
-            }.launchIn(viewModelScope)
-        }
+            dataState.stateMessage?.let { stateMessage ->
+                appendToMessageQueue(stateMessage)
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun removeHeadFromQueue() {
-        state.value?.let { state ->
-            try {
-                val queue = state.queue
-                queue.remove() // can throw exception if empty
-                this._state.value = state.copy(queue = queue)
-            } catch (e: Exception) {
-                Timber.i("removeHeadFromQueue: Nothing to remove from DialogQueue")
-            }
+        val current = _state.value
+        try {
+            val queue = current.queue
+            queue.remove() // can throw exception if empty
+            _state.value = current.copy(queue = queue)
+        } catch (e: Exception) {
+            Timber.i("removeHeadFromQueue: Nothing to remove from DialogQueue")
         }
     }
 
     private fun appendToMessageQueue(stateMessage: StateMessage) {
-        state.value?.let { state ->
-            val queue = state.queue
-            if (!stateMessage.doesMessageAlreadyExistInQueue(queue = queue)) {
-                if (stateMessage.response.uiComponentType !is UIComponentType.None) {
-                    queue.add(stateMessage)
-                    this._state.value = state.copy(queue = queue)
-                }
+        val current = _state.value
+        val queue = current.queue
+        if (!stateMessage.doesMessageAlreadyExistInQueue(queue = queue)) {
+            if (stateMessage.response.uiComponentType !is UIComponentType.None) {
+                queue.add(stateMessage)
+                _state.value = current.copy(queue = queue)
             }
         }
     }
