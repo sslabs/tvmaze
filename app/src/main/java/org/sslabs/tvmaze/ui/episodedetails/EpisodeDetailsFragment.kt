@@ -50,7 +50,7 @@ class EpisodeDetailsFragment : BaseFragment() {
     private fun init() {
         initMenu()
         uiCommunicationListener.setToolbarExpanded(true)
-        viewModel.state.value?.let { episode ->
+        viewModel.state.value.let { episode ->
             uiCommunicationListener.setToolbarTitle(
                 getString(R.string.episode_toolbar_title, episode.season, episode.number)
             )

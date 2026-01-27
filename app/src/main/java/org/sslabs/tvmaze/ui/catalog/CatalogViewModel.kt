@@ -1,7 +1,12 @@
 package org.sslabs.tvmaze.ui.catalog
 
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.sslabs.tvmaze.ApiConstants
@@ -20,17 +25,15 @@ class CatalogViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _state: MutableLiveData<CatalogState> = MutableLiveData(CatalogState())
-    val state: LiveData<CatalogState>
-        get() = _state
+    private val _state: MutableStateFlow<CatalogState> = MutableStateFlow(CatalogState())
+    val state: StateFlow<CatalogState> = _state.asStateFlow()
 
     init {
         val isLoadFavorites =
             CatalogFragmentArgs.fromSavedStateHandle(savedStateHandle).showFavorites
-        _state.value?.let { state ->
-            if (state.isFavorites != isLoadFavorites) {
-                _state.value = state.copy(isFavorites = isLoadFavorites)
-            }
+        val current = _state.value
+        if (current.isFavorites != isLoadFavorites) {
+            _state.value = current.copy(isFavorites = isLoadFavorites)
         }
 
         if (isLoadFavorites) {
@@ -67,55 +70,51 @@ class CatalogViewModel @Inject constructor(
     }
 
     private fun firstLoad() {
-        _state.value?.let { state ->
-            showsRepository.getShowsFromCache().onEach { dataState ->
-                this._state.value = state.copy(isLoading = dataState.isLoading)
+        showsRepository.getShowsFromCache().onEach { dataState ->
+            _state.value = _state.value.copy(isLoading = dataState.isLoading)
 
-                dataState.data?.let { list ->
-                    onUpdateLoadFromCache(list)
-                }
+            dataState.data?.let { list ->
+                onUpdateLoadFromCache(list)
+            }
 
-                dataState.stateMessage?.let { stateMessage ->
-                    appendToMessageQueue(stateMessage)
-                }
-            }.launchIn(viewModelScope)
-        }
+            dataState.stateMessage?.let { stateMessage ->
+                appendToMessageQueue(stateMessage)
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun index() {
-        _state.value?.let { state ->
-            showsRepository.getShows(state.page).onEach { dataState ->
-                this._state.value = state.copy(isLoading = dataState.isLoading)
+        val current = _state.value
+        showsRepository.getShows(current.page).onEach { dataState ->
+            _state.value = _state.value.copy(isLoading = dataState.isLoading)
 
-                dataState.data?.let { list ->
-                    this._state.value = state.copy(catalog = list)
-                }
+            dataState.data?.let { list ->
+                _state.value = _state.value.copy(catalog = list)
+            }
 
-                dataState.stateMessage?.let { stateMessage ->
-                    if (stateMessage.response.message?.contains(ErrorHandling.INVALID_PAGE) == true) {
-                        onUpdateQueryExhausted(true)
-                    } else {
-                        appendToMessageQueue(stateMessage)
-                    }
+            dataState.stateMessage?.let { stateMessage ->
+                if (stateMessage.response.message?.contains(ErrorHandling.INVALID_PAGE) == true) {
+                    onUpdateQueryExhausted(true)
+                } else {
+                    appendToMessageQueue(stateMessage)
                 }
-            }.launchIn(viewModelScope)
-        }
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun search() {
-        _state.value?.let { state ->
-            showsRepository.searchShows(state.query).onEach { dataState ->
-                this._state.value = state.copy(isLoading = dataState.isLoading)
+        val current = _state.value
+        showsRepository.searchShows(current.query).onEach { dataState ->
+            _state.value = _state.value.copy(isLoading = dataState.isLoading)
 
-                dataState.data?.let { list ->
-                    this._state.value = state.copy(catalog = list)
-                }
+            dataState.data?.let { list ->
+                _state.value = _state.value.copy(catalog = list)
+            }
 
-                dataState.stateMessage?.let { stateMessage ->
-                    appendToMessageQueue(stateMessage)
-                }
-            }.launchIn(viewModelScope)
-        }
+            dataState.stateMessage?.let { stateMessage ->
+                appendToMessageQueue(stateMessage)
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun nextPage() {
@@ -124,69 +123,60 @@ class CatalogViewModel @Inject constructor(
     }
 
     private fun loadFavorites() {
-        _state.value?.let { state ->
-            showsRepository.getFavorites().onEach { dataState ->
-                this._state.value = state.copy(isLoading = dataState.isLoading)
+        showsRepository.getFavorites().onEach { dataState ->
+            _state.value = _state.value.copy(isLoading = dataState.isLoading)
 
-                dataState.data?.let { list ->
-                    this._state.value = state.copy(catalog = list)
-                }
+            dataState.data?.let { list ->
+                _state.value = _state.value.copy(catalog = list)
+            }
 
-                dataState.stateMessage?.let { stateMessage ->
-                    appendToMessageQueue(stateMessage)
-                }
-            }.launchIn(viewModelScope)
-        }
+            dataState.stateMessage?.let { stateMessage ->
+                appendToMessageQueue(stateMessage)
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun incrementPageNumber() {
-        _state.value?.let { state ->
-            this._state.value = state.copy(page = state.page + 1)
-        }
+        val current = _state.value
+        _state.value = current.copy(page = current.page + 1)
     }
 
     private fun removeHeadFromQueue() {
-        state.value?.let { state ->
-            try {
-                val queue = state.queue
-                queue.remove() // can throw exception if empty
-                this._state.value = state.copy(queue = queue)
-            } catch (e: Exception) {
-                Timber.i("removeHeadFromQueue: Nothing to remove from DialogQueue")
-            }
+        val current = _state.value
+        try {
+            val queue = current.queue
+            queue.remove() // can throw exception if empty
+            _state.value = current.copy(queue = queue)
+        } catch (e: Exception) {
+            Timber.i("removeHeadFromQueue: Nothing to remove from DialogQueue")
         }
     }
 
     private fun appendToMessageQueue(stateMessage: StateMessage) {
-        state.value?.let { state ->
-            val queue = state.queue
-            if (!stateMessage.doesMessageAlreadyExistInQueue(queue = queue)) {
-                if (stateMessage.response.uiComponentType !is UIComponentType.None) {
-                    queue.add(stateMessage)
-                    this._state.value = state.copy(queue = queue)
-                }
+        val current = _state.value
+        val queue = current.queue
+        if (!stateMessage.doesMessageAlreadyExistInQueue(queue = queue)) {
+            if (stateMessage.response.uiComponentType !is UIComponentType.None) {
+                queue.add(stateMessage)
+                _state.value = current.copy(queue = queue)
             }
         }
     }
 
     private fun onUpdateQuery(query: String) {
-        _state.value = state.value?.copy(query = query)
+        _state.value = _state.value.copy(query = query)
     }
 
     private fun onUpdateQueryExhausted(isExhausted: Boolean) {
-        state.value?.let { state ->
-            this._state.value = state.copy(isQueryExhausted = isExhausted)
-        }
+        _state.value = _state.value.copy(isQueryExhausted = isExhausted)
     }
 
     private fun onUpdateLoadFromCache(list: List<Show>) {
-        _state.value?.let { state ->
-            if (list.isEmpty()) {
-                index()
-            } else {
-                val page = (list.last().id / ApiConstants.PAGE_SIZE)
-                this._state.value = state.copy(catalog = list, page = page)
-            }
+        if (list.isEmpty()) {
+            index()
+        } else {
+            val page = (list.last().id / ApiConstants.PAGE_SIZE)
+            _state.value = _state.value.copy(catalog = list, page = page)
         }
     }
 }

@@ -4,10 +4,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.sslabs.tvmaze.R
 import org.sslabs.tvmaze.SettingsKeys
 import org.sslabs.tvmaze.biometrics.AuthenticationHandler
@@ -99,15 +103,19 @@ class MainActivity : AppCompatActivity(), UICommunicationListener, DeviceAuthent
     }
 
     private fun observeData() {
-        viewModel.state.observe(this, { state ->
-            processQueue(
-                context = this,
-                queue = state.queue,
-                stateMessageCallback = object : StateMessageCallback {
-                    override fun removeMessageFromStack() {
-                        finish()
-                    }
-                })
-        })
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    processQueue(
+                        context = this@MainActivity,
+                        queue = state.queue,
+                        stateMessageCallback = object : StateMessageCallback {
+                            override fun removeMessageFromStack() {
+                                finish()
+                            }
+                        })
+                }
+            }
+        }
     }
 }

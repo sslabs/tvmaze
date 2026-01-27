@@ -5,8 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.sslabs.tvmaze.R
 import org.sslabs.tvmaze.databinding.FragmentEpisodesBinding
 import org.sslabs.tvmaze.ui.base.BaseFragment
@@ -55,21 +59,25 @@ class EpisodesFragment : BaseFragment() {
     }
 
     private fun observeData() {
-        viewModel.state.observe(viewLifecycleOwner, { state ->
-            uiCommunicationListener.displayProgressBar(state.isLoading)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    uiCommunicationListener.displayProgressBar(state.isLoading)
 
-            state.episodes?.let { list ->
-                adapter.submitData(list)
-            }
-
-            processQueue(
-                context = context,
-                queue = state.queue,
-                stateMessageCallback = object : StateMessageCallback {
-                    override fun removeMessageFromStack() {
-                        viewModel.onTriggerEvent(EpisodesEvent.OnRemoveHeadFromQueue)
+                    state.episodes?.let { list ->
+                        adapter.submitData(list)
                     }
-                })
-        })
+
+                    processQueue(
+                        context = context,
+                        queue = state.queue,
+                        stateMessageCallback = object : StateMessageCallback {
+                            override fun removeMessageFromStack() {
+                                viewModel.onTriggerEvent(EpisodesEvent.OnRemoveHeadFromQueue)
+                            }
+                        })
+                }
+            }
+        }
     }
 }

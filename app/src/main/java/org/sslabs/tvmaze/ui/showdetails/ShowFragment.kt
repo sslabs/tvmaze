@@ -10,7 +10,11 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.sslabs.tvmaze.R
 import org.sslabs.tvmaze.databinding.FragmentShowBinding
 import org.sslabs.tvmaze.ui.base.BaseFragment
@@ -78,7 +82,7 @@ class ShowFragment : BaseFragment() {
             }
 
             override fun onPrepareMenu(menu: Menu) {
-                viewModel.state.value?.let { state ->
+                viewModel.state.value.let { state ->
                     val item = menu.findItem(R.id.show_menu_action_favorite)
                     item.isChecked = state.show.favorite ?: false
                     updateFavoriteState(item)
@@ -90,25 +94,29 @@ class ShowFragment : BaseFragment() {
     }
 
     private fun observeData() {
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            uiCommunicationListener.displayProgressBar(state.isLoading)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    uiCommunicationListener.displayProgressBar(state.isLoading)
 
-            state.show.let { show ->
-                val menuItem = menu.findItem(R.id.show_menu_action_favorite)
-                menuItem.apply {
-                    isChecked = show.favorite ?: false
-                    updateFavoriteState(this)
+                    state.show.let { show ->
+                        val menuItem = menu.findItem(R.id.show_menu_action_favorite)
+                        menuItem.apply {
+                            isChecked = show.favorite ?: false
+                            updateFavoriteState(this)
+                        }
+                    }
+
+                    processQueue(
+                        context = context,
+                        queue = state.queue,
+                        stateMessageCallback = object : StateMessageCallback {
+                            override fun removeMessageFromStack() {
+                                viewModel.onTriggerEvent(EpisodesEvent.OnRemoveHeadFromQueue)
+                            }
+                        })
                 }
             }
-
-            processQueue(
-                context = context,
-                queue = state.queue,
-                stateMessageCallback = object : StateMessageCallback {
-                    override fun removeMessageFromStack() {
-                        viewModel.onTriggerEvent(EpisodesEvent.OnRemoveHeadFromQueue)
-                    }
-                })
         }
     }
 

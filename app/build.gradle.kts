@@ -122,8 +122,8 @@ dependencies {
     testImplementation(libs.mockito)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockwebserver)
-    testImplementation(libs.arch.core.testing)
     testImplementation(libs.coroutines.test)
+    testImplementation(libs.turbine)
 
     // Core android test libraries
     androidTestImplementation(libs.androidx.test.ext)

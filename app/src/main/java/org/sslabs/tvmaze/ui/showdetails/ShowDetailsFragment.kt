@@ -57,28 +57,28 @@ class ShowDetailsFragment : BaseFragment() {
 
     private fun initToolbar() {
         uiCommunicationListener.setToolbarExpanded(true)
-        uiCommunicationListener.setToolbarTitle(viewModel.state.value?.show?.name)
+        uiCommunicationListener.setToolbarTitle(viewModel.state.value.show.name)
     }
 
     private fun initPoster() {
         binding.itemShowPoster.let {
             Glide.with(it)
                 .setDefaultRequestOptions(glideRequestOptions)
-                .load(viewModel.state.value?.show?.image)
+                .load(viewModel.state.value.show.image)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(it)
         }
     }
 
     private fun initSchedule() {
-        viewModel.state.value?.let { state ->
+        viewModel.state.value.let { state ->
             binding.showDetailsAirsOn.showScheduleTimeTv.text = state.show.time
             binding.showDetailsAirsOn.airsDaysList.text = state.show.days?.joinToString("\n")
         }
     }
 
     private fun initGenres() {
-        viewModel.state.value?.show?.genres?.forEach { genre ->
+        viewModel.state.value.show.genres?.forEach { genre ->
             val chip = Chip(context).apply {
                 id = View.generateViewId()
                 text = genre
@@ -92,7 +92,7 @@ class ShowDetailsFragment : BaseFragment() {
     }
 
     private fun initSummary() {
-        viewModel.state.value?.let { state ->
+        viewModel.state.value.let { state ->
             state.show.summary?.let {
                 binding.showDetailsSummary.text =
                     Html.fromHtml(it, Html.FROM_HTML_MODE_COMPACT)

@@ -14,10 +14,14 @@ import android.widget.EditText
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import org.sslabs.tvmaze.R
 import org.sslabs.tvmaze.data.model.Show
 import org.sslabs.tvmaze.databinding.FragmentCatalogBinding
@@ -117,13 +121,14 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
                     super.onScrollStateChanged(recyclerView, newState)
                     val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                     val lastPosition = layoutManager.findLastVisibleItemPosition()
+                    val currentState = viewModel.state.value
 
-                    Timber.d("onScrollStateChanged: exhausted? ${viewModel.state.value?.isQueryExhausted}")
+                    Timber.d("onScrollStateChanged: exhausted? ${currentState.isQueryExhausted}")
                     if (lastPosition == adapter?.itemCount?.minus(1)
-                        && viewModel.state.value?.isLoading == false
-                        && viewModel.state.value?.isQueryExhausted == false
-                        && viewModel.state.value?.query?.isEmpty() == true
-                        && viewModel.state.value?.isFavorites == false
+                        && !currentState.isLoading
+                        && !currentState.isQueryExhausted
+                        && currentState.query.isEmpty()
+                        && !currentState.isFavorites
                     ) {
                         Timber.d("BlogFragment: attempting to load next page...")
                         viewModel.onTriggerEvent(CatalogEvent.NextPage)
@@ -147,7 +152,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
         val searchPlate: EditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text)
 
         // set initial value of query text after rotation/navigation
-        viewModel.state.value?.let { state ->
+        viewModel.state.value.let { state ->
             if (state.query.isNotBlank()) {
                 searchPlate.setText(state.query)
                 searchView.isIconified = false
@@ -180,24 +185,27 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
     }
 
     private fun observeData() {
-        viewModel.state.observe(viewLifecycleOwner) { state ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
 
-            uiCommunicationListener.displayProgressBar(state.isLoading)
+                    uiCommunicationListener.displayProgressBar(state.isLoading)
 
-            configureLayout()
+                    configureLayout()
 
-            processQueue(
-                context = context,
-                queue = state.queue,
-                stateMessageCallback = object : StateMessageCallback {
-                    override fun removeMessageFromStack() {
-                        viewModel.onTriggerEvent(CatalogEvent.OnRemoveHeadFromQueue)
+                    processQueue(
+                        context = context,
+                        queue = state.queue,
+                        stateMessageCallback = object : StateMessageCallback {
+                            override fun removeMessageFromStack() {
+                                viewModel.onTriggerEvent(CatalogEvent.OnRemoveHeadFromQueue)
+                            }
+                        })
+
+                    adapter.apply {
+                        submitList(state.catalog)
                     }
-                })
-
-
-            adapter.apply {
-                submitList(state.catalog)
+                }
             }
         }
     }
@@ -215,7 +223,7 @@ class CatalogFragment : BaseFragment(), CatalogItemViewHolder.Interaction {
     }
 
     private fun configureLayout() {
-        if (viewModel.state.value?.isFavorites == true) {
+        if (viewModel.state.value.isFavorites) {
             uiCommunicationListener.setToolbarTitle(getString(R.string.toolbar_title_favorites))
             uiCommunicationListener.displayHomeAsUp(true)
             menu.findItem(R.id.catalog_menu_action_show_favorites).isVisible = false
