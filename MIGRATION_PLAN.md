@@ -4,8 +4,8 @@
 
 - [x] **Phase 1:** Build System Foundation
 - [x] **Phase 2:** KAPT to KSP Migration
-- [ ] **Phase 3:** Kotlin 2.0 Upgrade
-- [ ] **Phase 4:** LiveData to StateFlow Migration
+- [x] **Phase 3:** Kotlin 2.0 Upgrade
+- [x] **Phase 4:** LiveData to StateFlow Migration
 - [ ] **Phase 5:** Jetpack Compose Setup
 - [ ] **Phase 6:** Compose UI Migration
 - [ ] **Phase 7:** Navigation 3 Migration
@@ -15,16 +15,16 @@
 
 ## Target State
 
-| Component | Before | After |
-|-----------|--------|-------|
-| Gradle/AGP | 8.0.0-rc01 | 8.7+ |
-| Kotlin | 1.8.10 | 2.0+ |
-| SDK | 33 | 35 |
-| Annotation Processing | KAPT | KSP |
-| Dependency Management | build.gradle | Version Catalogs |
+| Component | Before | After | Status |
+|-----------|--------|-------|--------|
+| Gradle/AGP | 8.0.0-rc01 | 8.7+ | Done |
+| Kotlin | 1.8.10 | 2.0+ | Done (2.0.21) |
+| SDK | 33 | 35 | Done |
+| Annotation Processing | KAPT | KSP | Done |
+| Dependency Management | build.gradle | Version Catalogs | Done |
 | UI | XML + View Binding | Jetpack Compose |
 | Navigation | Navigation 2.5.3 | Navigation 3 |
-| State Management | LiveData | StateFlow |
+| State Management | LiveData | StateFlow | Done |
 | Image Loading | Glide | Coil |
 | Material Design | Material 2 | Material 3 |
 
@@ -60,6 +60,8 @@ Replace KAPT with KSP for faster builds and better Kotlin support.
 
 Upgrade to Kotlin 2.0+ and add serialization support for Navigation 3.
 
+**Status:** Already complete - Project is on Kotlin 2.0.21 with KSP 2.0.21-1.0.28 and Kotlin Serialization configured.
+
 **Changes:**
 - Upgrade Kotlin to 2.0+
 - Add Kotlin Serialization plugin
@@ -71,13 +73,15 @@ Upgrade to Kotlin 2.0+ and add serialization support for Navigation 3.
 
 Modernize state management in all ViewModels.
 
+**Status:** Complete - All 4 ViewModels migrated to MutableStateFlow/StateFlow, all Fragment/Activity observers updated to repeatOnLifecycle + collect, tests migrated to Turbine, arch-core-testing removed.
+
 **Changes:**
 - Migrate `CatalogViewModel` to StateFlow
 - Migrate `EpisodesViewModel` to StateFlow
 - Migrate `EpisodeDetailsViewModel` to StateFlow
 - Migrate `MainViewModel` to StateFlow
-- Update all Fragment observers to use `collectAsStateWithLifecycle`
-- Update ViewModel tests
+- Update all Fragment/Activity observers to use `repeatOnLifecycle` + `collect`
+- Update ViewModel tests to Turbine
 
 ---
 
