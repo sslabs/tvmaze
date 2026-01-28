@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.navigation.safeargs)
@@ -51,6 +52,7 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        compose = true
     }
 }
 
@@ -116,6 +118,18 @@ dependencies {
     // Glide (will be replaced by Coil later)
     implementation(libs.glide)
     ksp(libs.glide.compiler)
+
+    // Compose
+    implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.compose)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.hilt.navigation.compose)
+    debugImplementation(libs.bundles.compose.debug)
+
+    // Coil for Compose image loading
+    implementation(libs.coil.compose)
 
     // Core unit test libraries
     testImplementation(libs.junit)
